@@ -1,7 +1,8 @@
-## Analysis scripts for Wenzel et al, Nature Communications 2018, DOI:
+# Analysis scripts for Wenzel et al, Nature Communications 2018
+https://www.nature.com/articles/s41467-018-05345-8
 
 
-# Individual Vesicle Tracking
+## Individual Vesicle Tracking
 
 Open movie in FIJI
 Make RGB image and keep source image
@@ -20,7 +21,7 @@ Save ROIs: Roi manager => More => Save
 
 
 
-# Frame by frame analysis
+## Frame by frame analysis
 
 
 Directory structure: See folder "Example Directory structure "
@@ -50,7 +51,7 @@ Open ”Process_Measurements.py”
 Use shifting matrix to account for delays after EGF pulse 
 Check whether Excel-files are saved 
 
-# Make grayscale images from Excel values:
+## Make grayscale images from Excel values:
 Open ”Lists_to_tiff.py”
 Insert numbers (save transposed values from Excel as .csv (comma delimited))
 Change savename
