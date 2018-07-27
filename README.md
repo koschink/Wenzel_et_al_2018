@@ -13,9 +13,8 @@ Open ”MeasureTracks_Gallery.py” in FIJI
 Use point tool to track one vesicle in the RGB image (Activate “auto next slice” and “add to ROI manager”)
 ROIs will be added to the ROI manager
 Activate original three channel movie and click on “run”
-Results table: Mark everything (CTRL+a) and copy everything (CTRL+c)
-Paste the values in an Excel sheet
-Replace . for , in Excel and plot the normalized intensities
+Results table: Copy values to an spreadsheet
+
 Save ROIs: Roi manager => More => Save
 
 
@@ -49,7 +48,7 @@ Process measurements:
 Open Python(x,y) => Run Spider
 Open ”Process_Measurements.py”
 Use shifting matrix to account for delays after EGF pulse 
-Check whether Excel-files saved 
+Check whether Excel-files are saved 
 
 #Make grayscale images from Excel values:
 Open ”Lists_to_tiff.py”
