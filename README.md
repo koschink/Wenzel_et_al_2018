@@ -6,10 +6,10 @@
 Open movie in FIJI
 Make RGB image and keep source image
 Open ”MeasureTracks_Gallery.py” in FIJI
-		roisize = 7
-		GalleryROI = 15
-		Pixelsize = 0.080
-		framerate = 0.33
+        roisize = 7
+        GalleryROI = 15
+        Pixelsize = 0.080
+        framerate = 0.33
 Use point tool to track one vesicle in the RGB image (Activate “auto next slice” and “add to ROI manager”)
 ROIs will be added to the ROI manager
 Activate original three channel movie and click on “run”
