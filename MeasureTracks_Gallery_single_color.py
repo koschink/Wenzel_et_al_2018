@@ -26,17 +26,23 @@ import itertools
 import glob
 import os
 
-
 MakeGallery = True
 
-roisize = 7
+save_gallery = True
 
-GalleryROI = 15
+roisize = 10
+
+GalleryROI = 50
 
 Pixelsize = 0.080
 framerate = 0.33
 
-threecolour = False
+
+twocolor =True
+
+
+#dataname = "P2_Measurements"
+savepath = "c:/example/"
 
 
 def normList2(L, normalizeTo=100):
@@ -99,15 +105,16 @@ channelnumber = imp.getNChannels()
 slicenumber = imp.getNSlices()
 timer = 0
 imp2 = IJ.createHyperStack("Gallery",GalleryROI, GalleryROI, channelnumber, slicenumber, roinumber, 16)
-imp2.copyLuts(imp)
+#imp2.copyLuts(imp)
 MeanChannel1 = []
-MeanChannel2 = []
-MeanChannel3 = []
+#MeanChannel2 = []
+#MeanChannel3 = []
 XYCoordinates = []
 Distance = []
 #print roinumber
 #for roi in RoiManager.getInstance().getRoisAsArray(): ## Does not work for time, since only xz coordinates are returned
 movietime = []
+
 Lastcoordinates = (0,0)
 for roi5 in range(roinumber):
     #print roi5
@@ -129,90 +136,96 @@ for roi5 in range(roinumber):
     Lastcoordinates = coord
     #print coord
     roi2 = OvalRoi(coord[0]-(roisize/2), coord[1]-roisize/2, roisize,roisize)
-    imp.setC(1)
+   # imp.setC(1)
     imp.setRoi(roi2)
     stats = imp.getStatistics(Measurements.MEAN | Measurements.AREA | Measurements.FERET | Measurements.CENTROID)
     MeanChannel1.append(stats.mean)
-    imp.setC(2)
-    stats = imp.getStatistics(Measurements.MEAN | Measurements.AREA | Measurements.FERET | Measurements.CENTROID)
-    MeanChannel2.append(stats.mean)
-    if channelnumber > 2:
-       imp.setC(3)
-       stats = imp.getStatistics(Measurements.MEAN | Measurements.AREA | Measurements.FERET | Measurements.CENTROID)
-       MeanChannel3.append(stats.mean)
-       threecolour = True
-    roi3 = Roi(coord[0]-(GalleryROI/2), coord[1]-GalleryROI/2, GalleryROI,GalleryROI)
-    imp.setC(1)
-    imp.setRoi(roi3)
-    imp.copy()
-    imp2.setT(timer)
-    imp2.setC(1)
-    imp2.paste()
-    imp.setC(2)
-    imp.copy()
-    imp2.setC(2)
-    imp2.paste()
-    if channelnumber > 2:
-       imp.setC(3)
-       imp.copy()
-       imp2.setC(3)
-       imp2.paste()
-       threecolour = True
+    if MakeGallery:
+        roi3 = Roi(coord[0]-(GalleryROI/2), coord[1]-GalleryROI/2, GalleryROI,GalleryROI)
+        imp.setRoi(roi3)
+        imp.copy()
+        imp2.setT(timer)
+        imp2.paste()
 
 parameters = 'columns=' +'3' + ' rows=2 scale=1 increment=1 border=4 font=12'
-print parameters
-print imp
+#print parameters
+#print imp
+if MakeGallery:
 
-imp3 = ExtractChannel(imp2, 1)
-imp4 = ExtractChannel(imp2, 2)
-if threecolour:
-    imp5 = ExtractChannel(imp2,3)
-
-imp6 = CombineStacks(GenerateRGB(imp2), GenerateRGB(imp3))
-imp7 = CombineStacks(imp6, GenerateRGB(imp4))
-if threecolour:
-    imp8 = CombineStacks(imp7, GenerateRGB(imp5))
-    imp8.show()
-else:
+    imp7 = imp2
     imp7.show()
 
 
+
 NormChannel1 = normList2(MeanChannel1)
-NormChannel2 = normList2(MeanChannel2)
-if threecolour:
-    NormChannel3 = normList2(MeanChannel3)
-else:
-    NormChannel3 = []
 
 Velocity = CalcVelocity(Distance, framerate)
 
-print MeanChannel1
-print MeanChannel2
-print MeanChannel3
-print NormChannel1
-print NormChannel2
-print NormChannel3
-print XYCoordinates
-print Distance
-print Velocity
+#print MeanChannel1
+#print MeanChannel2
+#print MeanChannel3
+#print NormChannel1
+#print NormChannel2
+#print NormChannel3
+#print XYCoordinates
+#print Distance
+#print Velocity
 ort = ResultsTable()
 ort.setPrecision(3)
-print ort.getCounter
+#print ort.getCounter
 
 count = len(MeanChannel1)
 for i in range(count):
-	ort.incrementCounter()
-	ort.addValue("Frame", i)
-	ort.addValue("Channel 1", MeanChannel1[i])
-	ort.addValue("Channel 2", MeanChannel2[i])
-	if threecolour:
-	    ort.addValue("Channel 3", MeanChannel3[i])
-	ort.addValue("NormCh 1", NormChannel1[i])
-	ort.addValue("NormCh 2", NormChannel2[i])
-        if threecolour:
-            ort.addValue("NormCh 3", NormChannel3[i])
-        ort.addValue("XY coordinates", str(XYCoordinates[i]))
-        ort.addValue("Distance in um", str((Distance[i]*Pixelsize)))
-        ort.addValue("Velocity in um/s", str((Velocity[i]*Pixelsize)))
+    ort.incrementCounter()
+    ort.addValue("Frame", i)
+    ort.addValue("Channel 1", MeanChannel1[i])
+    ort.addValue("X coordinate", str(XYCoordinates[i][0]))
+    ort.addValue("Y coordinate", str(XYCoordinates[i][1]))
+    ort.addValue("Distance in um", str((Distance[i]*Pixelsize)))
+    ort.addValue("Velocity in um/s", str((Velocity[i]*Pixelsize)))
+    ort.addValue("Timepoint", str(movietime[i]))
 ort.show("Measured intensities")
+
+dataname = imp.getShortTitle()
+
+
+filename_tif = dataname+"_gallery_001.tif"
+files_tif = glob.glob(savepath+"/Galleries/"+dataname+"*.tif")
+
+files_tif.sort()
+#print files
+if len(files_tif) == 0:
+    cur_num_tif = 0
+else:
+    cur_num_tif = int(os.path.basename(files_tif[-1])[-7:-4])
+    filename_tif = os.path.basename(files_tif[-1][:-7])
+    cur_num_tif +=1
+    cur_num_tif = str(cur_num_tif).zfill(3)
+    #print cur_num
+    filename_tif = filename_tif+cur_num_tif+str( os.path.basename(files_tif[-1][-4:]))
+savename_tif = savepath+"/galleries/"+filename_tif
+
+if save_gallery:
+    IJ.saveAs(imp7, "Tiff", savename_tif)
+    imp7.changes = False
+    imp7.close()
+
+
+filename = dataname+"_001.csv"
+files = glob.glob(savepath+"/Measurements/"+dataname+"*.csv")
+
+files.sort()
+#print files
+if len(files) == 0:
+    cur_num = 0
+else:
+    cur_num = int(os.path.basename(files[-1])[-7:-4])
+    filename = os.path.basename(files[-1][:-7])
+    cur_num +=1
+    cur_num = str(cur_num).zfill(3)
+    #print cur_num
+    filename = filename+cur_num+str( os.path.basename(files[-1][-4:]))
+savename = savepath+"/Measurements/"+filename
+ort.saveAs(savename)
+
 
